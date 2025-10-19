@@ -48,6 +48,10 @@ export function StrategyBuilder() {
     try {
       console.log("Starting backtest with:", { strategy: strategyDescription, config: finalConfig })
       
+      // Add timeout to prevent hanging
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 30000) // 30 second timeout
+      
       const response = await fetch("/api/backtest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -55,7 +59,10 @@ export function StrategyBuilder() {
           strategy: strategyDescription,
           config: finalConfig 
         }),
+        signal: controller.signal
       })
+      
+      clearTimeout(timeoutId)
 
       console.log("Backtest response status:", response.status)
       
@@ -86,7 +93,11 @@ export function StrategyBuilder() {
       setStep("results")
     } catch (error) {
       console.error("Backtest error:", error)
-      alert(`Failed to run backtest: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      if (error instanceof Error && error.name === 'AbortError') {
+        alert("Backtest timed out after 30 seconds. Please try again.")
+      } else {
+        alert(`Failed to run backtest: ${error instanceof Error ? error.message : 'Unknown error'}`)
+      }
     } finally {
       setIsRunning(false)
     }
