@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { KaggleDataService } from "@/lib/kaggle-service"
+import { KaggleDataService } from "@/lib/kaggle-service-mock"
 import { BacktestingEngine } from "@/lib/backtesting-engine"
 import { NLPToPythonConverter } from "@/lib/nlp-to-python"
 

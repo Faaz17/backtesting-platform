@@ -1,4 +1,4 @@
-import { KaggleApi } from 'kaggle';
+// Kaggle API will be imported dynamically on server side only
 
 export interface OHLCVData {
   timestamp: string;
