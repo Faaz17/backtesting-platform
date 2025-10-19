@@ -8,7 +8,7 @@
 3. **Vercel Account** - [Sign up here](https://vercel.com/)
 
 ### Required API Keys
-1. **OpenAI API Key** - [Get here](https://platform.openai.com/api-keys)
+1. **Groq API Key** - [Get here](https://console.groq.com/keys) (configured in environment variables)
 2. **Kaggle API** - Already configured in code
 
 ## 🏠 Local Development Setup
@@ -38,7 +38,7 @@ npm install pandas numpy scipy scikit-learn kaggle
 ### Step 3: Set Up Environment Variables
 Create a `.env.local` file in the project root:
 ```env
-OPENAI_API_KEY=your_openai_api_key_here
+GROQ_API_KEY=your_groq_api_key_here
 ```
 
 ### Step 4: Run Development Server
@@ -78,8 +78,8 @@ vercel
 
 #### Step 4: Set Environment Variables
 ```bash
-vercel env add OPENAI_API_KEY
-# Enter your OpenAI API key when prompted
+vercel env add GROQ_API_KEY
+# Enter your Groq API key when prompted (already configured in code)
 ```
 
 ### Method 2: GitHub Integration
@@ -112,14 +112,14 @@ git push -u origin main
 In Vercel dashboard:
 1. Go to Project Settings
 2. Environment Variables
-3. Add: `OPENAI_API_KEY` with your API key
+3. Add: `GROQ_API_KEY` with your API key (already configured in code)
 
 ## 🔧 Configuration
 
 ### Environment Variables
 ```env
 # Required
-OPENAI_API_KEY=sk-your-openai-key-here
+GROQ_API_KEY=your_groq_api_key_here
 
 # Optional (already configured in code)
 KAGGLE_USERNAME=djarch123

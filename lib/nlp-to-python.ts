@@ -1,5 +1,3 @@
-import { generateText } from 'ai';
-
 export interface PythonStrategy {
   code: string;
   entryConditions: string[];
@@ -12,11 +10,26 @@ export interface PythonStrategy {
 }
 
 export class NLPToPythonConverter {
+  private groqApiKey: string;
+
+  constructor(apiKey: string) {
+    this.groqApiKey = apiKey;
+  }
+
   async convertStrategyToPython(nlpStrategy: string): Promise<PythonStrategy> {
     try {
-      const { text: pythonCode } = await generateText({
-        model: "openai/gpt-4o-mini",
-        prompt: `You are a trading strategy expert. Convert the following natural language trading strategy into Python code that can be executed in a backtesting engine.
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.groqApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: "groq/compound",
+          messages: [
+            {
+              role: "user",
+              content: `You are a trading strategy expert. Convert the following natural language trading strategy into Python code that can be executed in a backtesting engine.
 
 Natural Language Strategy: ${nlpStrategy}
 
@@ -40,13 +53,29 @@ Return the response in this JSON format:
   }
 }
 
-Only return valid JSON, no additional text.`,
+Only return valid JSON, no additional text.`
+            }
+          ],
+          temperature: 0.7,
+          max_completion_tokens: 2048,
+          top_p: 1,
+          stream: false
+        })
       });
 
+      if (!response.ok) {
+        throw new Error(`Groq API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const pythonCode = data.choices[0].message.content;
+      
+      console.log('[Groq] Received response:', pythonCode);
+      
       const parsedStrategy = JSON.parse(pythonCode);
       return parsedStrategy;
     } catch (error) {
-      console.error('Error converting NLP strategy to Python:', error);
+      console.error('Error converting NLP strategy to Python with Groq:', error);
       
       // Fallback to a simple moving average strategy
       return this.getDefaultStrategy();
@@ -92,9 +121,18 @@ def calculate_signals(data):
 
   async enhanceStrategyWithIndicators(baseStrategy: PythonStrategy, additionalIndicators: string[]): Promise<PythonStrategy> {
     try {
-      const { text: enhancedCode } = await generateText({
-        model: "openai/gpt-4o-mini",
-        prompt: `Enhance the following Python trading strategy by adding the requested indicators: ${additionalIndicators.join(', ')}
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.groqApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: "groq/compound",
+          messages: [
+            {
+              role: "user",
+              content: `Enhance the following Python trading strategy by adding the requested indicators: ${additionalIndicators.join(', ')}
 
 Current Strategy Code:
 ${baseStrategy.code}
@@ -106,13 +144,27 @@ Requirements:
 4. Ensure the code is executable and well-structured
 5. Use proper pandas/numpy operations
 
-Return the enhanced code in the same JSON format as before.`,
+Return the enhanced code in the same JSON format as before.`
+            }
+          ],
+          temperature: 0.7,
+          max_completion_tokens: 2048,
+          top_p: 1,
+          stream: false
+        })
       });
 
+      if (!response.ok) {
+        throw new Error(`Groq API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const enhancedCode = data.choices[0].message.content;
+      
       const enhancedStrategy = JSON.parse(enhancedCode);
       return enhancedStrategy;
     } catch (error) {
-      console.error('Error enhancing strategy:', error);
+      console.error('Error enhancing strategy with Groq:', error);
       return baseStrategy;
     }
   }
@@ -156,9 +208,18 @@ Return the enhanced code in the same JSON format as before.`,
 
   async generateStrategyDocumentation(strategy: PythonStrategy): Promise<string> {
     try {
-      const { text: documentation } = await generateText({
-        model: "openai/gpt-4o-mini",
-        prompt: `Generate comprehensive documentation for the following trading strategy:
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.groqApiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: "groq/compound",
+          messages: [
+            {
+              role: "user",
+              content: `Generate comprehensive documentation for the following trading strategy:
 
 Strategy Code:
 ${strategy.code}
@@ -176,12 +237,26 @@ Please provide:
 5. Expected performance characteristics
 6. Potential improvements
 
-Format as markdown documentation.`,
+Format as markdown documentation.`
+            }
+          ],
+          temperature: 0.7,
+          max_completion_tokens: 2048,
+          top_p: 1,
+          stream: false
+        })
       });
 
+      if (!response.ok) {
+        throw new Error(`Groq API error: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const documentation = data.choices[0].message.content;
+      
       return documentation;
     } catch (error) {
-      console.error('Error generating documentation:', error);
+      console.error('Error generating documentation with Groq:', error);
       return 'Documentation generation failed.';
     }
   }

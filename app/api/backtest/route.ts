@@ -19,11 +19,13 @@ type BacktestRequest = {
   config: BacktestConfig
 }
 
-// Kaggle API credentials
+// API credentials
 const KAGGLE_CONFIG = {
   username: "djarch123",
   key: "f8d8fba4fa94fd8ea0e2168e91c40cad"
 }
+
+const GROQ_API_KEY = process.env.GROQ_API_KEY || "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"
 
 export async function POST(req: NextRequest) {
   try {
@@ -34,7 +36,7 @@ export async function POST(req: NextRequest) {
 
     // Initialize services
     const kaggleService = new KaggleDataService(KAGGLE_CONFIG)
-    const nlpConverter = new NLPToPythonConverter()
+    const nlpConverter = new NLPToPythonConverter(GROQ_API_KEY)
     const backtestingEngine = new BacktestingEngine([], config.initialCapital, config.commission / 100)
 
     // Step 1: Convert NLP strategy to Python logic
