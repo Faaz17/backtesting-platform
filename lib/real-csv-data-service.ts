@@ -31,7 +31,7 @@ export class RealCSVDataService {
     let price = 16500; // Starting price from your data
     const volatility = 0.0008; // Realistic 1-minute volatility
     
-    for (let i = 0; i < 30 * 24 * 60; i++) { // 30 days of 1-minute data
+    for (let i = 0; i < 100; i++) { // Only 100 data points for instant processing
       const date = new Date(startDate.getTime() + i * 60 * 1000);
       
       // Generate realistic OHLCV data
@@ -66,7 +66,7 @@ export class RealCSVDataService {
     let price = 1.05; // Starting EUR/USD price
     const volatility = 0.0001; // Realistic 1-minute volatility for forex
     
-    for (let i = 0; i < 30 * 24 * 60; i++) { // 30 days of 1-minute data
+    for (let i = 0; i < 100; i++) { // Only 100 data points for instant processing
       const date = new Date(startDate.getTime() + i * 60 * 1000);
       
       // Generate realistic OHLCV data for EUR/USD
@@ -101,7 +101,7 @@ export class RealCSVDataService {
     let price = 0.95; // Starting price for 2009 data
     const volatility = 0.0002; // Historical volatility
     
-    for (let i = 0; i < 30 * 24 * 60; i++) { // 30 days of 1-minute data
+    for (let i = 0; i < 100; i++) { // Only 100 data points for instant processing
       const date = new Date(startDate.getTime() + i * 60 * 1000);
       
       // Generate realistic OHLCV data for 2009
