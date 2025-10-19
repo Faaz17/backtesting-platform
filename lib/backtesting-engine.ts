@@ -98,19 +98,21 @@ export class BacktestingEngine {
   }
 
   private shouldEnter(strategy: StrategyLogic, current: OHLCVData, previous: OHLCVData): boolean {
-    // Simplified entry logic - use a simple price momentum strategy
-    // Enter when price is above a simple moving average
-    const sma10 = this.calculateSMA(10);
+    // More aggressive entry logic for better trade detection
+    const sma5 = this.calculateSMA(5);
     
-    if (sma10.length < 1) return false;
+    if (sma5.length < 1) return false;
     
-    const currentSMA10 = sma10[sma10.length - 1];
+    const currentSMA5 = sma5[sma5.length - 1];
     
-    // Enter when current price is above SMA10 and price is rising
-    const priceRising = current.close > previous.close;
-    const aboveSMA = current.close > currentSMA10;
+    // Enter when price is above SMA5 (more sensitive)
+    const aboveSMA = current.close > currentSMA5;
     
-    return priceRising && aboveSMA;
+    // Also enter on any significant price movement
+    const priceChange = Math.abs(current.close - previous.close) / previous.close;
+    const significantMove = priceChange > 0.001; // 0.1% move
+    
+    return aboveSMA || significantMove;
   }
 
   private enterTrade(data: OHLCVData, strategy: StrategyLogic): Trade | null {

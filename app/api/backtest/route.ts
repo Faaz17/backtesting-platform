@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
-// Use real data service for better results
-import { RealDataService } from "@/lib/real-data-service"
+// Use CSV data service with your actual data
+import { CSVDataService } from "@/lib/csv-data-service"
 import { BacktestingEngine } from "@/lib/backtesting-engine"
 import { NLPToPythonConverter } from "@/lib/nlp-to-python"
 
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     console.log("[Backtest] Config:", config)
 
     // Initialize services
-    const dataService = new RealDataService()
+    const dataService = new CSVDataService()
     const nlpConverter = new NLPToPythonConverter(GROQ_API_KEY)
     const backtestingEngine = new BacktestingEngine([], config.initialCapital, config.commission / 100)
 
