@@ -108,7 +108,14 @@ export function StrategyBuilder() {
   
   if (step === "results" && results) {
     console.log("Rendering ResultsDashboard with results:", results)
-    return <ResultsDashboard results={results} onBack={() => setStep("build")} />
+    return (
+      <div>
+        <div className="bg-blue-500 text-white p-2 text-center font-bold">
+          STRATEGY BUILDER: RENDERING RESULTS DASHBOARD
+        </div>
+        <ResultsDashboard results={results} onBack={() => setStep("build")} />
+      </div>
+    )
   }
 
   return (

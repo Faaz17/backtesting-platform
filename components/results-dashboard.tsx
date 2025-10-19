@@ -13,6 +13,8 @@ type ResultsDashboardProps = {
 }
 
 export function ResultsDashboard({ results, onBack }: ResultsDashboardProps) {
+  console.log("ResultsDashboard render - results:", results)
+  
   if (!results) {
     return (
       <div className="flex-1 flex items-center justify-center">
@@ -25,6 +27,10 @@ export function ResultsDashboard({ results, onBack }: ResultsDashboardProps) {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      {/* Debug banner */}
+      <div className="bg-red-500 text-white p-4 text-center font-bold">
+        RESULTS DASHBOARD IS RENDERING - RESULTS: {JSON.stringify(results).substring(0, 100)}...
+      </div>
       {/* Header */}
       <div className="flex items-center justify-between p-6 border-b border-gray-800">
         <h1 className="text-2xl font-bold text-green-400">Strategy Performance Report</h1>
