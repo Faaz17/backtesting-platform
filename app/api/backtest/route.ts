@@ -84,6 +84,7 @@ export async function POST(req: NextRequest) {
       config.commission / 100
     )
 
+    console.log("[Backtest] Engine created, starting backtest...")
     const results = await backtestingEngineWithData.runBacktest({
       entryConditions: pythonStrategy.entryConditions,
       exitConditions: pythonStrategy.exitConditions,
@@ -94,6 +95,12 @@ export async function POST(req: NextRequest) {
       }
     })
 
+    console.log("[Backtest] Backtest engine completed, results:", {
+      totalTrades: results.totalTrades,
+      netProfit: results.netProfit,
+      equityCurveLength: results.equityCurve.length
+    })
+
     console.log("[Backtest] Backtesting completed successfully")
     console.log("[Backtest] Results:", {
       totalTrades: results.totalTrades,
@@ -102,12 +109,20 @@ export async function POST(req: NextRequest) {
       sharpeRatio: results.sharpeRatio
     })
 
-    return NextResponse.json({ 
+    const response = { 
       results, 
       parsedStrategy: pythonStrategy,
       dataPoints: historicalData.length,
       strategyCode: pythonStrategy.code
+    }
+
+    console.log("[Backtest] Sending response:", {
+      hasResults: !!response.results,
+      resultsKeys: response.results ? Object.keys(response.results) : [],
+      dataPoints: response.dataPoints
     })
+
+    return NextResponse.json(response)
   } catch (error) {
     console.error("[Backtest] API error:", error)
     return NextResponse.json({ 

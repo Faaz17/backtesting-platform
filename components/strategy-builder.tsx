@@ -46,6 +46,8 @@ export function StrategyBuilder() {
     setShowConfig(false)
 
     try {
+      console.log("Starting backtest with:", { strategy: strategyDescription, config: finalConfig })
+      
       const response = await fetch("/api/backtest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -55,18 +57,36 @@ export function StrategyBuilder() {
         }),
       })
 
+      console.log("Backtest response status:", response.status)
+      
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error("Backtest API error:", errorText)
+        alert(`Backtest failed: ${response.status} - ${errorText}`)
+        return
+      }
+
       const data = await response.json()
+      console.log("Backtest response data:", data)
+      
       if (data.error) {
         console.error("Backtest error:", data.error)
         alert(`Backtest failed: ${data.error}`)
         return
       }
       
+      if (!data.results) {
+        console.error("No results in response:", data)
+        alert("Backtest completed but no results received")
+        return
+      }
+      
+      console.log("Setting results and switching to results view")
       setResults(data.results)
       setStep("results")
     } catch (error) {
-      console.error("[v0] Backtest error:", error)
-      alert("Failed to run backtest. Please try again.")
+      console.error("Backtest error:", error)
+      alert(`Failed to run backtest: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
       setIsRunning(false)
     }
