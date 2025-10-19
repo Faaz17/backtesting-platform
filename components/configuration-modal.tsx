@@ -44,7 +44,7 @@ export function ConfigurationModal({ config: initialConfig, onClose, onProceed, 
               <div className="flex items-center gap-2">
                 <span className="font-mono font-bold text-lg">{config.assets[0] || "TCS"}</span>
                 <span className="text-muted-foreground">|</span>
-                <span className="font-mono text-lg">2964.2 INR</span>
+                <span className="font-mono text-lg">AED</span>
               </div>
             </div>
             <Badge variant="secondary">BSE</Badge>
@@ -54,7 +54,7 @@ export function ConfigurationModal({ config: initialConfig, onClose, onProceed, 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="initial-capital" className="flex items-center gap-1">
-                Initial Capital (INR)
+                Initial Capital (AED)
                 <Info className="w-3 h-3 text-muted-foreground" />
               </Label>
               <Input

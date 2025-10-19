@@ -108,14 +108,7 @@ export function StrategyBuilder() {
   
   if (step === "results" && results) {
     console.log("Rendering ResultsDashboard with results:", results)
-    return (
-      <div>
-        <div className="bg-blue-500 text-white p-2 text-center font-bold">
-          STRATEGY BUILDER: RENDERING RESULTS DASHBOARD
-        </div>
-        <ResultsDashboard results={results} onBack={() => setStep("build")} />
-      </div>
-    )
+    return <ResultsDashboard results={results} onBack={() => setStep("build")} />
   }
 
   return (
@@ -144,48 +137,9 @@ export function StrategyBuilder() {
             <span className="px-2 py-0.5 bg-background/20 rounded text-xs">Lv 1</span>
           </Button>
           
-          {/* Temporary test button - More prominent */}
-          <Button
-            onClick={() => {
-              console.log("Test button clicked - forcing results view")
-              setStep("results")
-              setResults({
-                netProfit: 1250.50,
-                profitFactor: 1.85,
-                sharpeRatio: 1.42,
-                zScore: 0.75,
-                lrCorrelation: 0.68,
-                balanceDrawdownAbsolute: 150.25,
-                balanceDrawdownRelative: 12.5,
-                totalTrades: 45,
-                tradesWon: 28,
-                tradesLost: 17,
-                winRate: 62.2,
-                avgWin: 85.30,
-                avgLoss: 45.20,
-                maxDrawdown: 200.00,
-                maxDrawdownDuration: 5,
-                volatility: 0.15,
-                sortinoRatio: 1.85,
-                calmarRatio: 1.25,
-                equityCurve: Array.from({ length: 100 }, (_, i) => ({
-                  timestamp: new Date(Date.now() - (100 - i) * 24 * 60 * 60 * 1000).toISOString(),
-                  balance: 1000 + (i * 12.5) + Math.random() * 50
-                }))
-              })
-            }}
-            size="lg"
-            className="bg-red-600 hover:bg-red-700 text-white font-bold"
-          >
-            🧪 TEST RESULTS
-          </Button>
         </div>
       </div>
 
-      {/* Debug Info */}
-      <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded">
-        <strong>Debug:</strong> StrategyBuilder loaded. Step: {step}, Results: {results ? 'Yes' : 'No'}
-      </div>
 
       {/* Main Content */}
       <Card className="p-8 border-dashed border-2 border-border/50 bg-card/50">

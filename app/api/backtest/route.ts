@@ -96,6 +96,10 @@ export async function POST(req: NextRequest) {
     // Use instant mock results to avoid timeout issues
     console.log("[Backtest] Using instant mock results for reliable completion...")
     
+    const totalTrades = Math.floor(Math.random() * 50) + 10; // Random trades between 10 and 60
+    const tradesWon = Math.floor(Math.random() * (totalTrades - 5)) + 5; // Ensure tradesWon < totalTrades
+    const tradesLost = totalTrades - tradesWon; // Calculate remaining trades as losses
+    
     const results = {
       netProfit: Math.random() * 2000 - 500, // Random profit between -500 and 1500
       profitFactor: 1 + Math.random() * 2, // Random profit factor between 1 and 3
@@ -104,9 +108,9 @@ export async function POST(req: NextRequest) {
       lrCorrelation: Math.random() * 0.8 + 0.1, // Random correlation between 0.1 and 0.9
       balanceDrawdownAbsolute: Math.random() * 200,
       balanceDrawdownRelative: Math.random() * 20,
-      totalTrades: Math.floor(Math.random() * 50) + 10, // Random trades between 10 and 60
-      tradesWon: Math.floor(Math.random() * 30) + 5,
-      tradesLost: Math.floor(Math.random() * 20) + 5,
+      totalTrades: totalTrades,
+      tradesWon: tradesWon,
+      tradesLost: tradesLost,
       winRate: Math.random() * 40 + 30, // Random win rate between 30% and 70%
       avgWin: Math.random() * 100 + 20,
       avgLoss: Math.random() * 80 + 10,
