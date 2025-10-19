@@ -8,6 +8,13 @@ import { X, Plus } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 
+// Verified assets with Kaggle datasets
+const VERIFIED_ASSETS = [
+  { symbol: "BTCUSD", name: "Bitcoin/USD", type: "crypto", verified: true },
+  { symbol: "XAUUSD", name: "Gold/USD", type: "commodity", verified: true },
+  { symbol: "EURUSD", name: "Euro/USD", type: "forex", verified: true }
+]
+
 const POPULAR_CRYPTO = ["BTC/USDT", "ETH/USDT", "BNB/USDT", "SOL/USDT", "XRP/USDT"]
 const POPULAR_FOREX = ["EUR/USD", "GBP/USD", "USD/JPY", "AUD/USD", "USD/CAD"]
 
@@ -42,6 +49,32 @@ export function AssetSelector({ selectedAssets, onChange }: AssetSelectorProps) 
 
   return (
     <div className="space-y-4">
+      {/* Verified Assets Section */}
+      <div>
+        <div className="flex items-center gap-2 mb-2">
+          <p className="text-sm font-semibold text-foreground">Verified Assets</p>
+          <Badge variant="default" className="bg-green-600 text-white text-xs">
+            ✓ Kaggle Verified
+          </Badge>
+        </div>
+        <p className="text-xs text-muted-foreground mb-3">
+          These assets have verified 1-minute historical data from Kaggle
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {VERIFIED_ASSETS.map((asset) => (
+            <Button
+              key={asset.symbol}
+              variant={selectedAssets.includes(asset.symbol) ? "default" : "outline"}
+              size="sm"
+              onClick={() => addAsset(asset.symbol)}
+              className={selectedAssets.includes(asset.symbol) ? "shadow-[0_0_15px_rgba(0,255,150,0.3)]" : ""}
+            >
+              {asset.name}
+            </Button>
+          ))}
+        </div>
+      </div>
+
       <Select value={assetType} onValueChange={(v) => setAssetType(v as "crypto" | "forex")}>
         <SelectTrigger>
           <SelectValue />
@@ -53,7 +86,7 @@ export function AssetSelector({ selectedAssets, onChange }: AssetSelectorProps) 
       </Select>
 
       <div>
-        <p className="text-sm text-muted-foreground mb-2">Popular Assets</p>
+        <p className="text-sm text-muted-foreground mb-2">Other Popular Assets</p>
         <div className="flex flex-wrap gap-2">
           {popularAssets.map((asset) => (
             <Button

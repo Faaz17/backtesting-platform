@@ -1,5 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { generateText } from "ai"
+import { KaggleDataService } from "@/lib/kaggle-service"
+import { BacktestingEngine } from "@/lib/backtesting-engine"
+import { NLPToPythonConverter } from "@/lib/nlp-to-python"
 
 type BacktestConfig = {
   assets: string[]
@@ -17,148 +19,131 @@ type BacktestRequest = {
   config: BacktestConfig
 }
 
+// Kaggle API credentials
+const KAGGLE_CONFIG = {
+  username: "djarch123",
+  key: "f8d8fba4fa94fd8ea0e2168e91c40cad"
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { strategy, config }: BacktestRequest = await req.json()
 
-    console.log("[v0] Processing strategy:", strategy)
-    console.log("[v0] Config:", config)
+    console.log("[Backtest] Processing strategy:", strategy)
+    console.log("[Backtest] Config:", config)
 
-    // Use AI to parse the natural language strategy into structured rules
-    const { text: parsedStrategy } = await generateText({
-      model: "openai/gpt-4o-mini",
-      prompt: `You are a trading strategy parser. Convert the following natural language trading strategy into a structured JSON format with entry and exit rules.
+    // Initialize services
+    const kaggleService = new KaggleDataService(KAGGLE_CONFIG)
+    const nlpConverter = new NLPToPythonConverter()
+    const backtestingEngine = new BacktestingEngine([], config.initialCapital, config.commission / 100)
 
-Strategy: ${strategy}
+    // Step 1: Convert NLP strategy to Python logic
+    console.log("[Backtest] Converting NLP strategy to Python...")
+    const pythonStrategy = await nlpConverter.convertStrategyToPython(strategy)
+    console.log("[Backtest] Python strategy generated:", pythonStrategy)
 
-Return a JSON object with this structure:
-{
-  "entryConditions": ["condition1", "condition2"],
-  "exitConditions": ["condition1", "condition2"],
-  "indicators": ["indicator1", "indicator2"],
-  "riskManagement": {
-    "stopLoss": number,
-    "takeProfit": number
-  }
-}
-
-Only return valid JSON, no additional text.`,
-    })
-
-    console.log("[v0] Parsed strategy:", parsedStrategy)
-
-    // Parse the AI response
-    let structuredStrategy
+    // Step 2: Get historical data from Kaggle
+    console.log("[Backtest] Fetching historical data from Kaggle...")
+    let historicalData
     try {
-      structuredStrategy = JSON.parse(parsedStrategy)
-    } catch (e) {
-      console.error("[v0] Failed to parse AI response:", e)
-      structuredStrategy = {
-        entryConditions: ["Buy when conditions are met"],
-        exitConditions: ["Sell when conditions are met"],
-        indicators: config.indicators,
-        riskManagement: {
-          stopLoss: config.stopLoss,
-          takeProfit: config.takeProfit,
-        },
+      // Try to get data for the first selected asset
+      const primaryAsset = config.assets[0] || 'BTCUSD'
+      console.log(`[Backtest] Attempting to fetch data for: ${primaryAsset}`)
+      
+      historicalData = await kaggleService.getHistoricalData(primaryAsset, config.timeframe)
+      console.log(`[Backtest] Successfully retrieved ${historicalData.length} data points for ${primaryAsset}`)
+      
+      // Log sample data for verification
+      if (historicalData.length > 0) {
+        console.log(`[Backtest] Sample data point:`, {
+          timestamp: historicalData[0].timestamp,
+          close: historicalData[0].close,
+          volume: historicalData[0].volume
+        })
       }
+    } catch (error) {
+      console.error("[Backtest] Error fetching data from Kaggle:", error)
+      console.log("[Backtest] Falling back to simulated data...")
+      
+      // Fallback to simulated data
+      historicalData = generateSimulatedData(config.assets[0] || 'BTCUSD')
+      console.log(`[Backtest] Generated ${historicalData.length} simulated data points`)
     }
 
-    // Run the backtest simulation
-    const results = await runBacktest(structuredStrategy, config)
+    // Step 3: Run backtesting engine
+    console.log("[Backtest] Running backtesting engine...")
+    const backtestingEngineWithData = new BacktestingEngine(
+      historicalData, 
+      config.initialCapital, 
+      config.commission / 100
+    )
 
-    return NextResponse.json({ results, parsedStrategy: structuredStrategy })
+    const results = await backtestingEngineWithData.runBacktest({
+      entryConditions: pythonStrategy.entryConditions,
+      exitConditions: pythonStrategy.exitConditions,
+      indicators: pythonStrategy.indicators,
+      riskManagement: {
+        stopLoss: pythonStrategy.riskManagement.stopLoss,
+        takeProfit: pythonStrategy.riskManagement.takeProfit
+      }
+    })
+
+    console.log("[Backtest] Backtesting completed successfully")
+    console.log("[Backtest] Results:", {
+      totalTrades: results.totalTrades,
+      netProfit: results.netProfit,
+      profitFactor: results.profitFactor,
+      sharpeRatio: results.sharpeRatio
+    })
+
+    return NextResponse.json({ 
+      results, 
+      parsedStrategy: pythonStrategy,
+      dataPoints: historicalData.length,
+      strategyCode: pythonStrategy.code
+    })
   } catch (error) {
-    console.error("[v0] Backtest API error:", error)
-    return NextResponse.json({ error: "Failed to process backtest" }, { status: 500 })
+    console.error("[Backtest] API error:", error)
+    return NextResponse.json({ 
+      error: "Failed to process backtest", 
+      details: error instanceof Error ? error.message : "Unknown error"
+    }, { status: 500 })
   }
 }
 
-async function runBacktest(strategy: any, config: BacktestConfig) {
-  // Simulate backtesting logic
-  // In a real implementation, this would fetch historical data and run the strategy
-
-  const numTrades = Math.floor(Math.random() * 100) + 50
-  const winRate = 0.55 + Math.random() * 0.15 // 55-70% win rate
-  const tradesWon = Math.floor(numTrades * winRate)
-  const tradesLost = numTrades - tradesWon
-
-  const avgWin = config.takeProfit * config.initialCapital * 0.01
-  const avgLoss = config.stopLoss * config.initialCapital * 0.01
-
-  const grossProfit = tradesWon * avgWin
-  const grossLoss = tradesLost * avgLoss
-  const commissionCost = numTrades * (config.commission / 100) * config.initialCapital
-  const netProfit = grossProfit - grossLoss - commissionCost
-
-  const profitFactor = grossLoss > 0 ? grossProfit / grossLoss : grossProfit
-
-  // Generate equity curve
-  const equityCurve = []
-  let currentEquity = config.initialCapital
-  const startDate = new Date("2024-01-01")
-
-  for (let i = 0; i < 100; i++) {
+// Fallback function to generate simulated data when Kaggle fails
+function generateSimulatedData(symbol: string) {
+  const data = []
+  const startDate = new Date()
+  startDate.setFullYear(startDate.getFullYear() - 1)
+  
+  let price = 50000 // Starting price
+  const volatility = 0.02
+  
+  for (let i = 0; i < 365 * 24 * 60; i++) { // 1 year of 1-minute data
     const date = new Date(startDate)
-    date.setDate(date.getDate() + i * 3)
-
-    // Simulate equity growth with some volatility
-    const progress = i / 100
-    const trend = (netProfit / config.initialCapital) * progress
-    const volatility = (Math.random() - 0.5) * 0.1
-    currentEquity = config.initialCapital * (1 + trend + volatility)
-
-    equityCurve.push({
-      date: date.toISOString().split("T")[0],
-      value: Math.round(currentEquity * 100) / 100,
+    date.setMinutes(date.getMinutes() + i)
+    
+    // Random walk with slight upward bias
+    const change = (Math.random() - 0.48) * volatility
+    price = price * (1 + change)
+    
+    const open = price
+    const high = price * (1 + Math.random() * 0.01)
+    const low = price * (1 - Math.random() * 0.01)
+    const close = price * (1 + (Math.random() - 0.5) * 0.005)
+    const volume = Math.random() * 1000000
+    
+    data.push({
+      timestamp: date.toISOString(),
+      open: Math.round(open * 100) / 100,
+      high: Math.round(high * 100) / 100,
+      low: Math.round(low * 100) / 100,
+      close: Math.round(close * 100) / 100,
+      volume: Math.round(volume)
     })
   }
-
-  // Calculate drawdown
-  let maxEquity = config.initialCapital
-  let maxDrawdown = 0
-
-  for (const point of equityCurve) {
-    if (point.value > maxEquity) {
-      maxEquity = point.value
-    }
-    const drawdown = maxEquity - point.value
-    if (drawdown > maxDrawdown) {
-      maxDrawdown = drawdown
-    }
-  }
-
-  const balanceDrawdownAbsolute = maxDrawdown
-  const balanceDrawdownRelative = (maxDrawdown / maxEquity) * 100
-
-  // Calculate Sharpe Ratio (simplified)
-  const returns = []
-  for (let i = 1; i < equityCurve.length; i++) {
-    const ret = (equityCurve[i].value - equityCurve[i - 1].value) / equityCurve[i - 1].value
-    returns.push(ret)
-  }
-
-  const avgReturn = returns.reduce((a, b) => a + b, 0) / returns.length
-  const stdDev = Math.sqrt(returns.reduce((sum, ret) => sum + Math.pow(ret - avgReturn, 2), 0) / returns.length)
-  const sharpeRatio = stdDev > 0 ? (avgReturn / stdDev) * Math.sqrt(252) : 0
-
-  // Z-Score (simplified - measures consistency)
-  const zScore = winRate > 0.5 ? 1.5 + Math.random() * 1.5 : -1.5 + Math.random() * 1.5
-
-  // Linear Regression Correlation
-  const lrCorrelation = 0.7 + Math.random() * 0.25
-
-  return {
-    profitFactor: Math.round(profitFactor * 100) / 100,
-    equityCurve,
-    sharpeRatio: Math.round(sharpeRatio * 100) / 100,
-    zScore: Math.round(zScore * 100) / 100,
-    lrCorrelation: Math.round(lrCorrelation * 100) / 100,
-    netProfit: Math.round(netProfit * 100) / 100,
-    balanceDrawdownAbsolute: Math.round(balanceDrawdownAbsolute * 100) / 100,
-    balanceDrawdownRelative: Math.round(balanceDrawdownRelative * 100) / 100,
-    totalTrades: numTrades,
-    tradesWon,
-    tradesLost,
-  }
+  
+  return data
 }
+

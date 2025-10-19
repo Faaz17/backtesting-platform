@@ -25,4 +25,12 @@ export type BacktestResults = {
   totalTrades: number
   tradesWon: number
   tradesLost: number
+  winRate: number
+  avgWin: number
+  avgLoss: number
+  maxDrawdown: number
+  maxDrawdownDuration: number
+  volatility: number
+  sortinoRatio: number
+  calmarRatio: number
 }

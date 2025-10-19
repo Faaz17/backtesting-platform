@@ -113,26 +113,31 @@ export function ResultsDashboard({ results, onBack }: ResultsDashboardProps) {
           <Card className="p-6 hover:shadow-[0_0_20px_rgba(0,217,255,0.2)] transition-all">
             <p className="text-sm text-muted-foreground mb-1">Z-Score</p>
             <p className="text-xl font-semibold text-foreground">{results.zScore.toFixed(2)}</p>
+            <p className="text-xs text-muted-foreground mt-1">Consistency measure</p>
           </Card>
 
           <Card className="p-6 hover:shadow-[0_0_20px_rgba(0,217,255,0.2)] transition-all">
             <p className="text-sm text-muted-foreground mb-1">LR Correlation</p>
             <p className="text-xl font-semibold text-foreground">{results.lrCorrelation.toFixed(4)}</p>
+            <p className="text-xs text-muted-foreground mt-1">Linear regression correlation</p>
           </Card>
 
           <Card className="p-6 hover:shadow-[0_0_20px_rgba(0,217,255,0.2)] transition-all">
             <p className="text-sm text-muted-foreground mb-1">Max Drawdown (Absolute)</p>
             <p className="text-xl font-semibold text-destructive">${results.balanceDrawdownAbsolute.toFixed(2)}</p>
+            <p className="text-xs text-muted-foreground mt-1">Largest peak-to-trough decline</p>
           </Card>
 
           <Card className="p-6 hover:shadow-[0_0_20px_rgba(0,217,255,0.2)] transition-all">
             <p className="text-sm text-muted-foreground mb-1">Max Drawdown (Relative)</p>
             <p className="text-xl font-semibold text-destructive">{results.balanceDrawdownRelative.toFixed(2)}%</p>
+            <p className="text-xs text-muted-foreground mt-1">Percentage decline</p>
           </Card>
 
           <Card className="p-6 hover:shadow-[0_0_20px_rgba(0,217,255,0.2)] transition-all">
             <p className="text-sm text-muted-foreground mb-1">Total Trades</p>
             <p className="text-xl font-semibold text-foreground">{results.totalTrades}</p>
+            <p className="text-xs text-muted-foreground mt-1">Total executed trades</p>
           </Card>
 
           <Card className="p-6 hover:shadow-[0_0_20px_rgba(0,217,255,0.2)] transition-all">
@@ -147,6 +152,42 @@ export function ResultsDashboard({ results, onBack }: ResultsDashboardProps) {
                 {results.tradesLost}
               </Badge>
             </div>
+          </Card>
+
+          <Card className="p-6 hover:shadow-[0_0_20px_rgba(0,217,255,0.2)] transition-all">
+            <p className="text-sm text-muted-foreground mb-1">Average Win</p>
+            <p className="text-xl font-semibold text-success">${results.avgWin.toFixed(2)}</p>
+            <p className="text-xs text-muted-foreground mt-1">Average winning trade</p>
+          </Card>
+
+          <Card className="p-6 hover:shadow-[0_0_20px_rgba(0,217,255,0.2)] transition-all">
+            <p className="text-sm text-muted-foreground mb-1">Average Loss</p>
+            <p className="text-xl font-semibold text-destructive">${results.avgLoss.toFixed(2)}</p>
+            <p className="text-xs text-muted-foreground mt-1">Average losing trade</p>
+          </Card>
+
+          <Card className="p-6 hover:shadow-[0_0_20px_rgba(0,217,255,0.2)] transition-all">
+            <p className="text-sm text-muted-foreground mb-1">Volatility</p>
+            <p className="text-xl font-semibold text-foreground">{(results.volatility * 100).toFixed(2)}%</p>
+            <p className="text-xs text-muted-foreground mt-1">Annualized volatility</p>
+          </Card>
+
+          <Card className="p-6 hover:shadow-[0_0_20px_rgba(0,217,255,0.2)] transition-all">
+            <p className="text-sm text-muted-foreground mb-1">Sortino Ratio</p>
+            <p className="text-xl font-semibold text-foreground">{results.sortinoRatio.toFixed(2)}</p>
+            <p className="text-xs text-muted-foreground mt-1">Downside risk-adjusted return</p>
+          </Card>
+
+          <Card className="p-6 hover:shadow-[0_0_20px_rgba(0,217,255,0.2)] transition-all">
+            <p className="text-sm text-muted-foreground mb-1">Calmar Ratio</p>
+            <p className="text-xl font-semibold text-foreground">{results.calmarRatio.toFixed(2)}</p>
+            <p className="text-xs text-muted-foreground mt-1">Return vs max drawdown</p>
+          </Card>
+
+          <Card className="p-6 hover:shadow-[0_0_20px_rgba(0,217,255,0.2)] transition-all">
+            <p className="text-sm text-muted-foreground mb-1">Max Drawdown Duration</p>
+            <p className="text-xl font-semibold text-foreground">{results.maxDrawdownDuration}</p>
+            <p className="text-xs text-muted-foreground mt-1">Days in max drawdown</p>
           </Card>
         </div>
       </div>
