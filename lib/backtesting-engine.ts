@@ -98,20 +98,19 @@ export class BacktestingEngine {
   }
 
   private shouldEnter(strategy: StrategyLogic, current: OHLCVData, previous: OHLCVData): boolean {
-    // Simplified entry logic - in a real implementation, this would parse the strategy conditions
-    // For now, we'll use a simple moving average crossover strategy
-    const sma20 = this.calculateSMA(20);
-    const sma50 = this.calculateSMA(50);
+    // Simplified entry logic - use a simple price momentum strategy
+    // Enter when price is above a simple moving average
+    const sma10 = this.calculateSMA(10);
     
-    if (sma20.length < 2 || sma50.length < 2) return false;
+    if (sma10.length < 1) return false;
     
-    const currentSMA20 = sma20[sma20.length - 1];
-    const currentSMA50 = sma50[sma50.length - 1];
-    const prevSMA20 = sma20[sma20.length - 2];
-    const prevSMA50 = sma50[sma50.length - 2];
-
-    // Golden cross: SMA20 crosses above SMA50
-    return prevSMA20 <= prevSMA50 && currentSMA20 > currentSMA50;
+    const currentSMA10 = sma10[sma10.length - 1];
+    
+    // Enter when current price is above SMA10 and price is rising
+    const priceRising = current.close > previous.close;
+    const aboveSMA = current.close > currentSMA10;
+    
+    return priceRising && aboveSMA;
   }
 
   private enterTrade(data: OHLCVData, strategy: StrategyLogic): Trade | null {

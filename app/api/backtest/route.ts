@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
-// Use mock service for now to avoid build issues
-import { KaggleDataService } from "@/lib/kaggle-service-mock"
+// Use real data service for better results
+import { RealDataService } from "@/lib/real-data-service"
 import { BacktestingEngine } from "@/lib/backtesting-engine"
 import { NLPToPythonConverter } from "@/lib/nlp-to-python"
 
@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     console.log("[Backtest] Config:", config)
 
     // Initialize services
-    const kaggleService = new KaggleDataService(KAGGLE_CONFIG)
+    const dataService = new RealDataService()
     const nlpConverter = new NLPToPythonConverter(GROQ_API_KEY)
     const backtestingEngine = new BacktestingEngine([], config.initialCapital, config.commission / 100)
 
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
       const primaryAsset = config.assets[0] || 'BTCUSD'
       console.log(`[Backtest] Attempting to fetch data for: ${primaryAsset}`)
       
-      historicalData = await kaggleService.getHistoricalData(primaryAsset, config.timeframe)
+      historicalData = await dataService.getHistoricalData(primaryAsset, config.timeframe)
       console.log(`[Backtest] Successfully retrieved ${historicalData.length} data points for ${primaryAsset}`)
       
       // Log sample data for verification
