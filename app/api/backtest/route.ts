@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
+// Use mock service for now to avoid build issues
 import { KaggleDataService } from "@/lib/kaggle-service-mock"
 import { BacktestingEngine } from "@/lib/backtesting-engine"
 import { NLPToPythonConverter } from "@/lib/nlp-to-python"
@@ -85,6 +86,13 @@ export async function POST(req: NextRequest) {
     )
 
     console.log("[Backtest] Engine created, starting backtest...")
+    console.log("[Backtest] Strategy config:", {
+      entryConditions: pythonStrategy.entryConditions,
+      exitConditions: pythonStrategy.exitConditions,
+      indicators: pythonStrategy.indicators,
+      riskManagement: pythonStrategy.riskManagement
+    })
+    
     const results = await backtestingEngineWithData.runBacktest({
       entryConditions: pythonStrategy.entryConditions,
       exitConditions: pythonStrategy.exitConditions,
@@ -98,7 +106,9 @@ export async function POST(req: NextRequest) {
     console.log("[Backtest] Backtest engine completed, results:", {
       totalTrades: results.totalTrades,
       netProfit: results.netProfit,
-      equityCurveLength: results.equityCurve.length
+      equityCurveLength: results.equityCurve.length,
+      profitFactor: results.profitFactor,
+      sharpeRatio: results.sharpeRatio
     })
 
     console.log("[Backtest] Backtesting completed successfully")
