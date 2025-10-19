@@ -14,6 +14,9 @@ type ResultsDashboardProps = {
 
 export function ResultsDashboard({ results, onBack }: ResultsDashboardProps) {
   console.log("ResultsDashboard render - results:", results)
+  console.log("Equity curve data:", results?.equityCurve)
+  console.log("Equity curve length:", results?.equityCurve?.length)
+  console.log("First equity point:", results?.equityCurve?.[0])
   
   if (!results) {
     return (
@@ -123,7 +126,7 @@ export function ResultsDashboard({ results, onBack }: ResultsDashboardProps) {
             
             <div className="h-[400px]">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={results.equityCurve}>
+                <LineChart data={results.equityCurve || []}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                   <XAxis 
                     dataKey="date" 
@@ -162,7 +165,7 @@ export function ResultsDashboard({ results, onBack }: ResultsDashboardProps) {
             
             {/* Peak Value Annotation */}
             <div className="mt-2 text-center">
-              <span className="text-sm text-green-400">Peak: ${Math.max(...results.equityCurve.map(point => point.value)).toLocaleString()}</span>
+              <span className="text-sm text-green-400">Peak: ${results.equityCurve && results.equityCurve.length > 0 ? Math.max(...results.equityCurve.map(point => point.value)).toLocaleString() : 'N/A'}</span>
             </div>
           </div>
         </div>

@@ -116,8 +116,8 @@ export async function POST(req: NextRequest) {
       sortinoRatio: Math.random() * 2 + 0.5,
       calmarRatio: Math.random() * 1.5 + 0.2,
       equityCurve: Array.from({ length: 50 }, (_, i) => ({
-        timestamp: new Date(Date.now() - (50 - i) * 24 * 60 * 60 * 1000).toISOString(),
-        balance: 10000 + (i * 20) + Math.random() * 100
+        date: new Date(Date.now() - (50 - i) * 24 * 60 * 60 * 1000).toISOString(),
+        value: 10000 + (i * 20) + Math.random() * 100
       }))
     }
     
