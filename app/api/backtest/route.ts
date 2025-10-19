@@ -25,7 +25,11 @@ const KAGGLE_CONFIG = {
   key: "f8d8fba4fa94fd8ea0e2168e91c40cad"
 }
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY || "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"
+const GROQ_API_KEY = process.env.GROQ_API_KEY
+
+if (!GROQ_API_KEY) {
+  throw new Error('GROQ_API_KEY environment variable is required')
+}
 
 export async function POST(req: NextRequest) {
   try {
