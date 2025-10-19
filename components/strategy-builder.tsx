@@ -92,7 +92,11 @@ export function StrategyBuilder() {
     }
   }
 
+  // Debug logging
+  console.log("StrategyBuilder render - step:", step, "results:", !!results, "results data:", results)
+  
   if (step === "results" && results) {
+    console.log("Rendering ResultsDashboard with results:", results)
     return <ResultsDashboard results={results} onBack={() => setStep("build")} />
   }
 
@@ -111,15 +115,54 @@ export function StrategyBuilder() {
             <p className="text-sm text-muted-foreground">Create your custom, no-code, rule-based strategy!</p>
           </div>
         </div>
-        <Button
-          onClick={handleProceedToBacktest}
-          disabled={selectedAssets.length === 0 || !strategyDescription.trim() || isRunning}
-          size="lg"
-          className="gap-2 shadow-[0_0_20px_rgba(168,85,247,0.4)] bg-gradient-to-r from-primary to-accent hover:shadow-[0_0_30px_rgba(168,85,247,0.6)]"
-        >
-          {isRunning ? "Running Backtest..." : "Proceed to Backtest"}
-          <span className="px-2 py-0.5 bg-background/20 rounded text-xs">Lv 1</span>
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            onClick={handleProceedToBacktest}
+            disabled={selectedAssets.length === 0 || !strategyDescription.trim() || isRunning}
+            size="lg"
+            className="gap-2 shadow-[0_0_20px_rgba(168,85,247,0.4)] bg-gradient-to-r from-primary to-accent hover:shadow-[0_0_30px_rgba(168,85,247,0.6)]"
+          >
+            {isRunning ? "Running Backtest..." : "Proceed to Backtest"}
+            <span className="px-2 py-0.5 bg-background/20 rounded text-xs">Lv 1</span>
+          </Button>
+          
+          {/* Temporary test button */}
+          <Button
+            onClick={() => {
+              console.log("Test button clicked - forcing results view")
+              setStep("results")
+              setResults({
+                netProfit: 1250.50,
+                profitFactor: 1.85,
+                sharpeRatio: 1.42,
+                zScore: 0.75,
+                lrCorrelation: 0.68,
+                balanceDrawdownAbsolute: 150.25,
+                balanceDrawdownRelative: 12.5,
+                totalTrades: 45,
+                tradesWon: 28,
+                tradesLost: 17,
+                winRate: 62.2,
+                avgWin: 85.30,
+                avgLoss: 45.20,
+                maxDrawdown: 200.00,
+                maxDrawdownDuration: 5,
+                volatility: 0.15,
+                sortinoRatio: 1.85,
+                calmarRatio: 1.25,
+                equityCurve: Array.from({ length: 100 }, (_, i) => ({
+                  timestamp: new Date(Date.now() - (100 - i) * 24 * 60 * 60 * 1000).toISOString(),
+                  balance: 1000 + (i * 12.5) + Math.random() * 50
+                }))
+              })
+            }}
+            variant="outline"
+            size="lg"
+            className="border-green-500 text-green-500 hover:bg-green-500 hover:text-white"
+          >
+            Test Results
+          </Button>
+        </div>
       </div>
 
       {/* Main Content */}
