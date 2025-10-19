@@ -64,9 +64,15 @@ export class BacktestingEngine {
     this.equityCurve = [];
 
     // Process each data point
+    console.log(`[BacktestingEngine] Processing ${this.data.length} data points...`)
     for (let i = 1; i < this.data.length; i++) {
       const currentData = this.data[i];
       const previousData = this.data[i - 1];
+
+      // Log progress every 10% of data
+      if (i % Math.floor(this.data.length / 10) === 0) {
+        console.log(`[BacktestingEngine] Progress: ${Math.floor((i / this.data.length) * 100)}%`)
+      }
 
       // Check for entry conditions
       if (this.shouldEnter(strategy, currentData, previousData)) {
@@ -82,6 +88,8 @@ export class BacktestingEngine {
       // Update equity curve
       this.updateEquity(currentData.timestamp);
     }
+    
+    console.log(`[BacktestingEngine] Completed processing. Total trades: ${this.trades.length}`)
 
     // Close any remaining open trades
     this.closeAllTrades();

@@ -93,34 +93,19 @@ export async function POST(req: NextRequest) {
       riskManagement: pythonStrategy.riskManagement
     })
     
-    // For now, use mock results to test the flow
-    console.log("[Backtest] Using mock results for testing...")
-    const results = {
-      netProfit: 1250.50,
-      profitFactor: 1.85,
-      sharpeRatio: 1.42,
-      zScore: 0.75,
-      lrCorrelation: 0.68,
-      balanceDrawdownAbsolute: 150.25,
-      balanceDrawdownRelative: 12.5,
-      totalTrades: 45,
-      tradesWon: 28,
-      tradesLost: 17,
-      winRate: 62.2,
-      avgWin: 85.30,
-      avgLoss: 45.20,
-      maxDrawdown: 200.00,
-      maxDrawdownDuration: 5,
-      volatility: 0.15,
-      sortinoRatio: 1.85,
-      calmarRatio: 1.25,
-      equityCurve: Array.from({ length: 100 }, (_, i) => ({
-        timestamp: new Date(Date.now() - (100 - i) * 24 * 60 * 60 * 1000).toISOString(),
-        balance: 1000 + (i * 12.5) + Math.random() * 50
-      }))
-    }
+    // Run the actual backtesting engine
+    console.log("[Backtest] Running actual backtesting engine...")
+    const results = await backtestingEngineWithData.runBacktest({
+      entryConditions: pythonStrategy.entryConditions,
+      exitConditions: pythonStrategy.exitConditions,
+      indicators: pythonStrategy.indicators,
+      riskManagement: {
+        stopLoss: pythonStrategy.riskManagement.stopLoss,
+        takeProfit: pythonStrategy.riskManagement.takeProfit
+      }
+    })
 
-    console.log("[Backtest] Mock results generated:", {
+    console.log("[Backtest] Real backtest results generated:", {
       totalTrades: results.totalTrades,
       netProfit: results.netProfit,
       equityCurveLength: results.equityCurve.length,
