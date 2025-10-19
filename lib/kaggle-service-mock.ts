@@ -32,7 +32,7 @@ export class KaggleDataService {
     let price = symbol === 'BTCUSD' ? 50000 : symbol === 'XAUUSD' ? 2000 : 1.1;
     const volatility = symbol === 'BTCUSD' ? 0.02 : symbol === 'XAUUSD' ? 0.01 : 0.005;
     
-    for (let i = 0; i < 30 * 24 * 60; i++) { // 30 days of 1-minute data for faster processing
+    for (let i = 0; i < 7 * 24 * 60; i++) { // 7 days of 1-minute data for much faster processing
       const date = new Date(startDate);
       date.setMinutes(date.getMinutes() + i);
       
