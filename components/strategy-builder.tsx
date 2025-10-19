@@ -126,7 +126,7 @@ export function StrategyBuilder() {
             <span className="px-2 py-0.5 bg-background/20 rounded text-xs">Lv 1</span>
           </Button>
           
-          {/* Temporary test button */}
+          {/* Temporary test button - More prominent */}
           <Button
             onClick={() => {
               console.log("Test button clicked - forcing results view")
@@ -156,13 +156,17 @@ export function StrategyBuilder() {
                 }))
               })
             }}
-            variant="outline"
             size="lg"
-            className="border-green-500 text-green-500 hover:bg-green-500 hover:text-white"
+            className="bg-red-600 hover:bg-red-700 text-white font-bold"
           >
-            Test Results
+            🧪 TEST RESULTS
           </Button>
         </div>
+      </div>
+
+      {/* Debug Info */}
+      <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-2 rounded">
+        <strong>Debug:</strong> StrategyBuilder loaded. Step: {step}, Results: {results ? 'Yes' : 'No'}
       </div>
 
       {/* Main Content */}
